@@ -12,6 +12,11 @@ export const Home = () => {
     handleAction,
     handleAddShop,
     handleUpdateShop,
+    setAreaSearchTest,
+    setCategorySearchTest,
+    setOpeningDateSearch,
+    setShopNameText,
+    setSearch
   } = useShop();
   const {
     register,
@@ -28,38 +33,104 @@ export const Home = () => {
     handleUpdateShop(data);
   };
   const [show, setShow] = useState(false);
+  const [openingDate, setOpeningDate] = useState(moment().format("YYYY-MM-DD"));
 
   const handleClose = () => {
     setShow(false);
     reset({});
   };
-  console.log(show, getValues(), "ssssssssssssssssssssdfghjhgfre");
   const shop = useSelector((state) => state?.shop?.shop?.shop);
   const { singleShop } = useSelector((state) => state?.singleShop);
-  console.log(singleShop, "singleShopiiiiiiiiii");
   useEffect(() => {
     singleShop?.id
       ? reset({
-          ...singleShop,
-          opening_date: moment(singleShop?.opening_date).format("YYYY-MM-DD"),
-          closing_date: moment(singleShop?.closing_date).format("YYYY-MM-DD"),
-        })
+        ...singleShop,
+        opening_date: moment(singleShop?.opening_date).format("YYYY-MM-DD"),
+        closing_date: moment(singleShop?.closing_date).format("YYYY-MM-DD"),
+      })
       : handleClose();
   }, [singleShop]);
   const handleShow = () => {
     setShow(true);
   };
+
   return (
     <>
       <Container>
         {showShopList ? (
           <>
             <Row className="mt-5">
-              <Col md="6" className="text-center">
+              <Col md="12" className="text-center">
                 <h1 className="">Shop List</h1>
               </Col>
-              <Col md="6" className="text-center">
+            </Row>
+            <Row className="mb-3">
+              <Col md="2" className="text-right">
                 <Button onClick={() => setShopList(false)}>Add Shop</Button>
+              </Col>
+              <Col md="" className="text-center">
+                {/* <h1 className="">Shop List</h1> */}
+              </Col>
+              <Col md="2" className="text-center">
+                <select
+                  className="form-control"
+                  onChange={e => setSearch({ area: e.target.value })}
+                  style={{ background: '#e9ecef' }}
+                >
+                  <option value="">Select Area</option>
+                  <option value="Thane">Thane</option>
+                  <option value="Pune">Pune</option>
+                  <option value="Mumbai Suburban">Mumbai Suburban</option>
+                  <option value="Nashik">Nashik</option>
+                  <option value="Nagpur">Nagpur</option>
+                  <option value="Ahmednagar">Ahmednagar</option>
+                  <option value="Solapur">Solapur</option>
+                </select>
+              </Col>
+              <Col md="2" className="text-center">
+                <select
+                  className="form-control"
+                  onChange={e => setSearch({ category: e.target.value })}
+                  style={{ background: '#e9ecef' }}
+                >
+                  <option value="">Select Category</option>
+                  <option value="Grocery">Grocery</option>
+                  <option value="Butcher">Butcher</option>
+                  <option value="Baker">Baker</option>
+                  <option value="Chemist">Chemist</option>
+                  <option value="Stationery shop">Stationery shop</option>
+                </select>
+              </Col>
+              <Col md="1" className="text-center">
+                <input
+                  type="date"
+                  className="form-control"
+                  onChange={e => {
+                    setSearch({ opening_date: e.target.value })
+                  }}
+                  required
+                />
+              </Col>
+              <Col md="1" className="text-center">
+                {/* <span>*closing date*</span> */}
+                <input
+                  type="date"
+                  className="form-control"
+                  onChange={e => {
+                    setSearch({ closing_date: e.target.value })
+                  }}
+                  required
+                />
+              </Col>
+              <Col md="2" className="text-center">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search by name"
+                  onChange={e => {
+                    setSearch({ name: e.target.value })
+                  }}
+                />
               </Col>
             </Row>
             <Row>
@@ -83,8 +154,8 @@ export const Home = () => {
                         <td>{shop?.name}</td>
                         <td>{shop?.area}</td>
                         <td>{shop?.category}</td>
-                        <td>{new Date(shop?.opening_date).toUTCString()}</td>
-                        <td>{new Date(shop?.closing_date).toUTCString()}</td>
+                        <td>{moment(shop?.opening_date).format("YYYY-MM-DD")}</td>
+                        <td>{moment(shop?.closing_date).format("YYYY-MM-DD")}</td>
                         <td>
                           <Button
                             onClick={() => {
@@ -115,10 +186,10 @@ export const Home = () => {
         ) : (
           <>
             <Row className="mt-5">
-              <Col md="6" className="text-center">
+              <Col md="10" className="text-center">
                 <h1 className="">Add a Shop In List</h1>
               </Col>
-              <Col md="6" className="text-center">
+              <Col md="2" className="text-center">
                 <Button onClick={() => setShopList(true)}>Shop List</Button>
               </Col>
             </Row>
@@ -133,29 +204,42 @@ export const Home = () => {
                       id="name"
                       placeholder="Enter shop name"
                       name="name"
-                      {...register("name")}
+                      {...register("name", { required: true, pattern: /[A-Za-z]/ })}
                     />
+                    {errors.name && errors.name.type === "required" && <span className="error">This is required</span>}
+                    {errors.name && errors.name.type === "pattern" && <span className="error">Shop name can contain only letters</span>}
                   </div>
                   <div className="mb-3">
                     <label for="area">Shop Area</label>
-                    <input
-                      type="text"
+                    <select
                       className="form-control"
-                      id="area"
-                      placeholder="Enter Area"
-                      name="area"
-                      {...register("area")}
-                    />
+                      {...register("area", { required: true })}>
+                      <option value="">Select</option>
+                      <option value="Thane">Thane</option>
+                      <option value="Pune">Pune</option>
+                      <option value="Mumbai Suburban">Mumbai Suburban</option>
+                      <option value="Nashik">Nashik</option>
+                      <option value="Nagpur">Nagpur</option>
+                      <option value="Ahmednagar">Ahmednagar</option>
+                      <option value="Solapur">Solapur</option>
+                    </select>
+                    {errors.area && errors.area.type === "required" && <span className="error">This is required</span>}
+
                   </div>
                   <div className="mb-3">
                     <label for="categories">Shop Categories</label>
-                    <input
-                      type="text"
+                    <select
                       className="form-control"
-                      placeholder="Enter Shop Categories"
-                      name="area"
-                      {...register("category")}
-                    />
+                      {...register("category", { required: true })}>
+                      <option value="">Select</option>
+                      <option value="Grocery">Grocery</option>
+                      <option value="Butcher">Butcher</option>
+                      <option value="Baker">Baker</option>
+                      <option value="Chemist">Chemist</option>
+                      <option value="Stationery shop">Stationery shop</option>
+                    </select>
+                    {errors.category && errors.category.type === "required" && <span className="error">This is required</span>}
+
                   </div>
                   <div className="mb-3">
                     <label for="categories">Opening Date</label>
@@ -164,7 +248,13 @@ export const Home = () => {
                       className="form-control"
                       placeholder="Enter Shop Categories"
                       name="area"
-                      {...register("opening_date")}
+                      min={moment().format("YYYY-MM-DD")}
+                      onChange={e => {
+                        setValue('opening_date', e.target.value)
+                        setOpeningDate(e.target.value)
+                      }}
+                      required
+                    // {...register("opening_date", { required: true })}
                     />
                   </div>
                   <div className="mb-3">
@@ -172,10 +262,12 @@ export const Home = () => {
                     <input
                       type="date"
                       className="form-control"
+                      min={moment(openingDate).format("YYYY-MM-DD")}
                       placeholder="Enter Shop Categories"
                       name="area"
-                      {...register("closing_date")}
+                      {...register("closing_date", { required: true })}
                     />
+                    {errors.closing_date && errors.closing_date.type === "required" && <span className="error">This is required</span>}
                   </div>
                   <button type="submit" className="btn btn-primary">
                     Submit
@@ -209,29 +301,40 @@ export const Home = () => {
                       id="name"
                       placeholder="Enter shop name"
                       name="name"
-                      {...register("name")}
+                      {...register("name", { required: true, pattern: /[A-Za-z]/ })}
                     />
+                    {errors.name && errors.name.type === "required" && <span className="error">This is required</span>}
+                    {errors.name && errors.name.type === "pattern" && <span className="error">Shop name can contain only letters</span>}
                   </div>
                   <div className="mb-3">
                     <label for="area">Shop Area</label>
-                    <input
-                      type="text"
+                    <select
                       className="form-control"
-                      id="area"
-                      placeholder="Enter Area"
-                      name="area"
-                      {...register("area")}
-                    />
+                      {...register("area", { required: true })}>
+                      <option value="">Select</option>
+                      <option value="Thane">Thane</option>
+                      <option value="Pune">Pune</option>
+                      <option value="Mumbai Suburban">Mumbai Suburban</option>
+                      <option value="Nashik">Nashik</option>
+                      <option value="Nagpur">Nagpur</option>
+                      <option value="Ahmednagar">Ahmednagar</option>
+                      <option value="Solapur">Solapur</option>
+                    </select>
+                    {errors.area && errors.area.type === "required" && <span className="error">This is required</span>}
                   </div>
                   <div className="mb-3">
                     <label for="categories">Shop Categories</label>
-                    <input
-                      type="text"
+                    <select
                       className="form-control"
-                      placeholder="Enter Shop Categories"
-                      name="area"
-                      {...register("category")}
-                    />
+                      {...register("category", { required: true })}>
+                      <option value="">Select</option>
+                      <option value="Grocery">Grocery</option>
+                      <option value="Butcher">Butcher</option>
+                      <option value="Baker">Baker</option>
+                      <option value="Chemist">Chemist</option>
+                      <option value="Stationery shop">Stationery shop</option>
+                    </select>
+                    {errors.category && errors.category.type === "required" && <span className="error">This is required</span>}
                   </div>
                   <div className="mb-3">
                     <label for="categories">Opening Date</label>
@@ -240,7 +343,14 @@ export const Home = () => {
                       className="form-control"
                       placeholder="Enter Shop Categories"
                       name="area"
-                      {...register("opening_date")}
+                      defaultValue={moment(singleShop?.opening_date).format("YYYY-MM-DD")}
+                      min={moment().format("YYYY-MM-DD")}
+                      onChange={e => {
+                        setValue('opening_date', e.target.value)
+                        setOpeningDate(e.target.value)
+                      }}
+                      required
+                    // {...register("opening_date", { required: true })}
                     />
                   </div>
                   <div className="mb-3">
@@ -248,10 +358,12 @@ export const Home = () => {
                     <input
                       type="date"
                       className="form-control"
+                      min={moment(openingDate).format("YYYY-MM-DD")}
                       placeholder="Enter Shop Categories"
                       name="area"
-                      {...register("closing_date")}
+                      {...register("closing_date", { required: true })}
                     />
+                    {errors.closing_date && errors.closing_date.type === "required" && <span className="error">This is required</span>}
                   </div>
                   <button type="submit" className="btn btn-primary mr-5">
                     Submit

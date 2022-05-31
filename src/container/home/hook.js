@@ -14,9 +14,18 @@ import {
 const useShop = (props) => {
   const dispatch = useDispatch();
   const [showShopList, setShopList] = useState(true);
+  const [search, setSearch] = useState({ area: '' });
+  const [areaSearchTest, setAreaSearchTest] = useState('');
+  const [categorySearchTest, setCategorySearchTest] = useState('');
+  const [shopnameText, setShopNameText] = useState('');
+  const [openingDateSearch, setOpeningDateSearch] = useState('');
   const [singleShop, setSingleShop] = useState({});
-  const { data, refetch } = useQuery(["getShops"], () => getShops());
-
+  const { data, refetch } = useQuery(["getShops"], () => getShops(search));
+  console.log(areaSearchTest, 'areaSearchTestareaSearchTestareaSearchTest')
+  useEffect(() => {
+    console.log(areaSearchTest, 'areaSearchTestareaSearchTestareaSearchTest11')
+    refetch()
+  }, [areaSearchTest,search, categorySearchTest, openingDateSearch, shopnameText])
   useEffect(() => {
     dispatch(
       setShop({
@@ -25,13 +34,10 @@ const useShop = (props) => {
     );
   }, [data]);
   const { mutate: deleteShop } = useMutation((shopId) => {
-    console.log(shopId, "wishListArrayById, cartArrayById, userId");
     deleteShopById(shopId)
       .then(() => {
         refetch();
         setShopList(true);
-        console.log(data);
-        console.log("why not?");
       })
       .catch((err) => {
         console.log(err);
@@ -42,21 +48,16 @@ const useShop = (props) => {
       .then(() => {
         refetch();
         setShopList(true);
-        console.log(data);
-        console.log("why not?");
       })
       .catch((err) => {
         console.log(err);
       });
   });
   const { mutate: getShop } = useMutation((shopId) => {
-    console.log(shopId, "wishListArrayById, cartArrayById, userId");
     getShopById(shopId)
       .then((res) => {
         dispatch(setSingleShopData(res));
         setSingleShop(res);
-        console.log(data);
-        console.log("why not?");
       })
       .catch((err) => {
         console.log(err);
@@ -68,8 +69,6 @@ const useShop = (props) => {
         dispatch(setSingleShopData({}));
         setSingleShop({});
         refetch();
-        console.log(data);
-        console.log("why not?");
       })
       .catch((err) => {
         console.log(err);
@@ -87,17 +86,20 @@ const useShop = (props) => {
     addShop(data);
   };
   const handleUpdateShop = (data) => {
-    console.log(data, "datadatadatadata");
     updateShop(data);
   };
 
-  console.log(singleShop, "singleShopsingleShopsingleShopsingleShop");
   return {
     showShopList,
     setShopList,
     handleAction,
     handleAddShop,
     handleUpdateShop,
+    setAreaSearchTest,
+    setCategorySearchTest,
+    setOpeningDateSearch,
+    setShopNameText,
+    setSearch
   };
 };
 export default useShop;

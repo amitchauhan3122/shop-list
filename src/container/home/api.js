@@ -1,7 +1,7 @@
 import { api, apiEndPoints } from "../../api";
 
-export const getShops = async () => {
-  const res = await api.get(apiEndPoints.getShops);
+export const getShops = async (search) => {
+  const res = await api.get(apiEndPoints.getShops, { params: search });
   return res?.data;
 };
 export const getShopById = async (id) => {
